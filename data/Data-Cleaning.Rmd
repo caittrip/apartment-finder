@@ -1,0 +1,76 @@
+---
+title: "Data-Cleaning"
+output: html_document
+date: "2026-10-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+```{r}
+data <- read_delim(
+  "apartments_for_rent_classified_100K.csv",
+  delim = ";",
+  quote = "",
+  col_types = cols(.default = col_character()),
+  show_col_types = FALSE
+)
+```
+
+```{r}
+```
+
+```{r}
+sorted_data <- data |>
+  ## If the price is listed as weekly, it is multiplied to get a monthly price
+  mutate( 
+    price = as.numeric(na_if(trimws(price), "null")),
+    price = ifelse(
+      price_type == "Weekly",
+      price * 52 / 12,
+      price
+    ),
+    ## Removes rows with NA values
+    bedrooms = as.numeric(na_if(trimws(bedrooms), "null")),
+    bathrooms = as.numeric(na_if(trimws(bathrooms), "null")),
+    square_feet = as.numeric(na_if(trimws(square_feet), "null")),
+    latitude = as.numeric(na_if(trimws(latitude), "null")),
+    longitude = as.numeric(na_if(trimws(longitude), "null"))
+  ) |>
+  ## Limits columns to only required variables
+  select(id, price, bedrooms, bathrooms,
+         square_feet, cityname, state,
+         latitude, longitude) |>
+  rename(city = cityname) |>
+  ## Converts NULL to NA
+  mutate(
+    city = na_if(trimws(city), "null"),
+    state = na_if(toupper(trimws(state)), "NULL")
+  ) |>
+  ## Removes NA values from price, bedrooms, bathrooms, city, and state
+  filter(
+    !is.na(price),
+    !is.na(bedrooms),
+    !is.na(bathrooms),
+    price > 0,
+    bedrooms >= 0,
+    bathrooms > 0,
+    !is.na(city),
+    trimws(city) != "",
+    !is.na(state),
+    trimws(state) != ""
+  ) |>
+  ## Removes duplicate IDs
+  dplyr::distinct(id, .keep_all = TRUE)
+```
+
+```{r}
+## Writes Sorted Data to New File
+write.csv(sorted_data, "apartment_data_updated.csv", row.names = FALSE)
+```
