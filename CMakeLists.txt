@@ -6,4 +6,5 @@ set(CMAKE_CXX_STANDARD 14)
 add_executable(apartment_finder
         main.cpp
         ApartmentLoader.cpp
+        Scoring.cpp
 )
