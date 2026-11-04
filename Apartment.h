@@ -9,6 +9,7 @@
 
 struct Apartment {
     std::string id;
+    std::string address;
     double price;
     double bedrooms;
     double bathrooms;

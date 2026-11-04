@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -33,8 +34,8 @@ vector<Apartment> loadApartments(const string &fileName) {
     while (getline(file, line)) {
         vector<string> fields = getDataLine(line);
 
-        // 9 columns are expected
-        if (fields.size() != 9) {
+        // 10 columns are expected
+        if (fields.size() != 10) {
             continue;
         }
         Apartment apartment;
@@ -45,10 +46,15 @@ vector<Apartment> loadApartments(const string &fileName) {
         apartment.bedrooms = stod(fields[2]);
         apartment.bathrooms = stod(fields[3]);
         apartment.square_feet = stoi(fields[4]);
-        apartment.city = fields[5];
-        apartment.state = fields[6];
-        apartment.latitude = stod(fields[7]);
-        apartment.longitude = stod(fields[8]);
+        apartment.address = fields[5];
+        apartment.city = fields[6];
+        apartment.state = fields[7];
+        apartment.latitude = stod(fields[8]);
+        apartment.longitude = stod(fields[9]);
+        apartment.address.erase(remove(apartment.address.begin(), apartment.address.end(), '"'), apartment.address.end());
+        apartment.city.erase(remove(apartment.city.begin(), apartment.city.end(), '"'), apartment.city.end());
+        apartment.state.erase(remove(apartment.state.begin(), apartment.state.end(), '"'), apartment.state.end());
+
 
         apartments.push_back(apartment);
     }

@@ -24,9 +24,6 @@ data <- read_delim(
 ```
 
 ```{r}
-```
-
-```{r}
 sorted_data <- data |>
   ## If the price is listed as weekly, it is multiplied to get a monthly price
   mutate( 
@@ -45,13 +42,15 @@ sorted_data <- data |>
   ) |>
   ## Limits columns to only required variables
   select(id, price, bedrooms, bathrooms,
-         square_feet, cityname, state,
+         square_feet, address, cityname, state,
          latitude, longitude) |>
   rename(city = cityname) |>
   ## Converts NULL to NA
   mutate(
     city = na_if(trimws(city), "null"),
-    state = na_if(toupper(trimws(state)), "NULL")
+    state = na_if(toupper(trimws(state)), "NULL"),
+    address = na_if(trimws(address), "null"),
+    address = gsub(",", "", address)
   ) |>
   ## Removes NA values from price, bedrooms, bathrooms, city, and state
   filter(
@@ -63,14 +62,18 @@ sorted_data <- data |>
     bathrooms > 0,
     !is.na(city),
     trimws(city) != "",
+    tolower(trimws(city)) != "null",
     !is.na(state),
-    trimws(state) != ""
+    trimws(state) != "",
+    tolower(trimws(state)) != "null"
   ) |>
   ## Removes duplicate IDs
   dplyr::distinct(id, .keep_all = TRUE)
+
+sorted_data
 ```
 
 ```{r}
 ## Writes Sorted Data to New File
-write.csv(sorted_data, "apartment_data_updated.csv", row.names = FALSE)
+write.csv(sorted_data, "apartment_data.csv", row.names = FALSE)
 ```

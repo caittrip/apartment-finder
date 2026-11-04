@@ -8,5 +8,9 @@ add_executable(apartment_finder
         ApartmentLoader.cpp
         Scoring.cpp
         HeapSort.cpp
+        Filtering.h
+        Filtering.cpp
+        MergeSort.h
+        MergeSort.cpp
 
 )
