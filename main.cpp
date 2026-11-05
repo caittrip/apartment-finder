@@ -136,13 +136,12 @@ int main() {
                  << " | Rent: $" << apt.price
                  << " | Bedrooms: " << apt.bedrooms
                  << " | Bathrooms: " << apt.bathrooms
-                 << " | Address: " << apt.address
                  << " | City: " << apt.city
                  << " | State: " << apt.state
                  << " | Square Feet: " << apt.square_feet
                  << " | Score: " << apt.score << '\n';
         }
-        cout << "\nEnter n for next, p for previous, or q to quit: ";
+        cout << "\nEnter n for next, p for previous, d for details, or q to quit: ";
         string choice;
         if (!getline(cin, choice) || choice == "q") {
             break;
@@ -151,6 +150,84 @@ int main() {
             pageStart += pageSize;
         } else if (choice == "p" && pageStart > 0) {
             pageStart -= pageSize;
+                } else if (choice == "d") {
+            int listingNumber;
+            if (!readIntInRange("Enter a listing number from this page: ",
+                                listingNumber,
+                                static_cast<int>(pageStart + 1),
+                                static_cast<int>(pageEnd))) {
+                break;
+            }
+
+            const Apartment& apt = filtered[listingNumber - 1];
+
+            cout << "\nListing #" << listingNumber << '\n'
+                 << "Listing ID: " << apt.id << '\n'
+                 << "Location: " << apt.city << ", " << apt.state << '\n'
+                 << "Address: "
+                 << (apt.address.empty() || apt.address == "NA"
+                         ? "Unavailable" : apt.address)
+                 << '\n'
+                 << "Monthly rent: $" << apt.price << '\n'
+                 << "Match score: " << apt.score << "/100\n";
+
+            cout << "\nPress Enter to return to the results.";
+            string answer;
+            if (!getline(cin, answer)) {
+                break;
+            }
+                } else if (choice == "d") {
+            int listingNumber;
+            if (!readIntInRange("Enter a listing number from this page: ",
+                                listingNumber,
+                                static_cast<int>(pageStart + 1),
+                                static_cast<int>(pageEnd))) {
+                break;
+            }
+
+            const Apartment& apt = filtered[listingNumber - 1];
+
+            cout << "\nListing #" << listingNumber << '\n'
+                 << "Listing ID: " << apt.id << '\n'
+                 << "Location: " << apt.city << ", " << apt.state << '\n'
+                 << "Address: "
+                 << (apt.address.empty() || apt.address == "NA"
+                         ? "Unavailable" : apt.address)
+                 << '\n'
+                 << "Monthly rent: $" << apt.price << '\n'
+                 << "Match score: " << apt.score << "/100\n";
+
+            cout << "\nPress Enter to return to the results.";
+            string answer;
+            if (!getline(cin, answer)) {
+                break;
+            }
+            } else if (choice == "d") {
+            int listingNumber;
+            if (!readIntInRange("Enter a listing number from this page: ",
+                                listingNumber,
+                                static_cast<int>(pageStart + 1),
+                                static_cast<int>(pageEnd))) {
+                break;
+            }
+
+            const Apartment& apt = filtered[listingNumber - 1];
+
+            cout << "\nListing #" << listingNumber << '\n'
+                 << "Listing ID: " << apt.id << '\n'
+                 << "Location: " << apt.city << ", " << apt.state << '\n'
+                 << "Address: "
+                 << (apt.address.empty() || apt.address == "NA"
+                         ? "Unavailable" : apt.address)
+                 << '\n'
+                 << "Monthly rent: $" << apt.price << '\n'
+                 << "Match score: " << apt.score << "/100\n";
+
+            cout << "\nPress Enter to return to the results.";
+            string answer;
+            if (!getline(cin, answer)) {
+                break;
+            }
         } else {
             cout << "That option is unavailable on this page.\n";
         }
