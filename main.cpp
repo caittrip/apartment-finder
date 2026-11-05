@@ -8,6 +8,7 @@
 #include <string>
 #include <cmath>
 #include <sstream>
+#include <limits>
 using namespace std;
 
 template <typename Number>
@@ -29,6 +30,20 @@ bool readNonnegative(const string& prompt, Number& value) {
         cout << "Please enter a valid number of 0 or more.\n";
     }
 }
+
+bool readIntInRange(const string& prompt, int& value, int minimum, int maximum) {
+    while (readNonnegative(prompt, value)) {
+        if (value >= minimum && value <= maximum) {
+            return true;
+        }
+
+        cout << "Please enter a whole number from "
+             << minimum << " to " << maximum << ".\n";
+    }
+
+    return false;
+}
+
 int main() {
     // Load the cleaned apartment data
     vector<Apartment> apartments = loadApartments("data/apartment_data.csv");
@@ -69,37 +84,76 @@ int main() {
         return 0;
     }
     conditions.minBedrooms = minBedrooms;
-    
+
     if (!readNonnegative("Enter minimum bathrooms (e.g., 1.5): ",
                          conditions.minBathrooms)) {
         return 0;
     }
     vector<Apartment> filtered =
         filteringApartments(apartments, conditions);
-
     cout << "Apartments after Filtering: " << filtered.size() << endl;
-
+    
+    
     UserPreferences prefs;
     prefs.maxRent = conditions.maxRent;
-    prefs.desiredSqft = 1000;
-    prefs.affordabilityWeight = 50;
-    prefs.spaceWeight = 50;
+    if (!readIntInRange("Enter desired square footage: ", prefs.desiredSqft,
+                        1, numeric_limits<int>::max())) {
+        return 0;
+    }
+    if (!readIntInRange("How important is affordability (1-5)? ",
+                        prefs.affordabilityWeight, 1, 5)) {
+        return 0;
+    }
+    if (!readIntInRange("How important is space (1-5)? ",
+                        prefs.spaceWeight, 1, 5)) {
+        return 0;
+    }
+
+    if (filtered.empty()) {
+        cout << "\nNo apartments matched your search. "
+             << "Try a higher budget or fewer filters.\n";
+        return 0;
+    }
 
     scoreApartments(filtered, prefs);
 
     //heapSort(filtered, ranksBefore);
     mergeSort(filtered, ranksBefore);
 
-    for (int i = 0; i < 10 && i < filtered.size(); i++) {
-        cout << "ID: " << filtered[i].id
-        << " | Rent: $" << filtered[i].price
-        << " | Bedrooms: " << filtered[i].bedrooms
-        << " | Bathrooms: " << filtered[i].bathrooms
-        << " | Address: " << filtered[i].address
-        << " | City: " << filtered[i].city
-        << " | State: " << filtered[i].state
-        << " | Square Feet: " << filtered[i].square_feet
-        << " | Score: " << filtered[i].score << endl;
+    const size_t pageSize = 10;
+    size_t pageStart = 0;
+
+    while (true) {
+        size_t pageEnd = pageStart + pageSize;
+        if (pageEnd > filtered.size()) {
+            pageEnd = filtered.size();
+        }
+        cout << "\nShowing matches " << pageStart + 1 << " to " << pageEnd
+             << " of " << filtered.size() << "\n";
+        for (size_t i = pageStart; i < pageEnd; i++) {
+            const Apartment& apt = filtered[i];
+            cout << i + 1
+                 << " | Rent: $" << apt.price
+                 << " | Bedrooms: " << apt.bedrooms
+                 << " | Bathrooms: " << apt.bathrooms
+                 << " | Address: " << apt.address
+                 << " | City: " << apt.city
+                 << " | State: " << apt.state
+                 << " | Square Feet: " << apt.square_feet
+                 << " | Score: " << apt.score << '\n';
+        }
+        cout << "\nEnter n for next, p for previous, or q to quit: ";
+        string choice;
+        if (!getline(cin, choice) || choice == "q") {
+            break;
+        }
+        if (choice == "n" && pageEnd < filtered.size()) {
+            pageStart += pageSize;
+        } else if (choice == "p" && pageStart > 0) {
+            pageStart -= pageSize;
+        } else {
+            cout << "That option is unavailable on this page.\n";
+        }
     }
 
     return 0;
