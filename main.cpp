@@ -49,7 +49,8 @@ int main() {
     vector<Apartment> apartments = loadApartments("data/apartment_data.csv");
     cout << "Apartments loaded: " << apartments.size() << endl;
 
-    FilterConditions conditions;
+    while (true) {
+        FilterConditions conditions;
 
 
     // Leaving either answer blank skips that location filter.
@@ -108,10 +109,14 @@ int main() {
                         prefs.spaceWeight, 1, 5)) {
         return 0;
     }
-
     if (filtered.empty()) {
         cout << "\nNo apartments matched your search. "
-             << "Try a higher budget or fewer filters.\n";
+        << "Try a higher budget or fewer filters.\n";
+        cout << "Enter r to search again, or press Enter to quit: ";
+        string choice;
+        if (getline(cin, choice) && choice == "r") {
+            continue;
+        }
         return 0;
     }
 
@@ -141,9 +146,14 @@ int main() {
                  << " | Square Feet: " << apt.square_feet
                  << " | Score: " << apt.score << '\n';
         }
-        cout << "\nEnter n for next, p for previous, d for details, or q to quit: ";
+        cout << "\nEnter n for next, p for previous, d for details, r for a new search, or q to quit: ";
         string choice;
+        //program will exit if user presses enter without inputting a choice or if they input q
         if (!getline(cin, choice) || choice == "q") {
+            return 0;
+        }
+
+        if (choice == "r") {
             break;
         }
         if (choice == "n" && pageEnd < filtered.size()) {
@@ -232,6 +242,8 @@ int main() {
             cout << "That option is unavailable on this page.\n";
         }
     }
+    }
+
 
     return 0;
 }
