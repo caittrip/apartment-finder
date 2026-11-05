@@ -10,15 +10,32 @@
 #include <sstream>
 using namespace std;
 
-
+template <typename Number>
+bool readNonnegative(const string& prompt, Number& value) {
+    while (true) {
+        cout << prompt;
+        string answer;
+        if (!getline(cin, answer)) {
+            return false;
+        }
+        istringstream input(answer);
+        Number number;
+        char extra;
+        if ((input >> number) && isfinite(number) && number >= 0
+            && !(input >> extra)) {
+            value = number;
+            return true;
+        }
+        cout << "Please enter a valid number of 0 or more.\n";
+    }
+}
 int main() {
     // Load the cleaned apartment data
     vector<Apartment> apartments = loadApartments("data/apartment_data.csv");
     cout << "Apartments loaded: " << apartments.size() << endl;
 
     FilterConditions conditions;
-    conditions.minBedrooms = 1;
-    conditions.minBathrooms = 1;
+
 
     // Leaving either answer blank skips that location filter.
     cout << "Enter a state abbreviation (e.g., FL, or press Enter for any state): ";
@@ -46,7 +63,17 @@ int main() {
 
         cout << "Please enter a positive amount like 1500 or 1500.50.\n";
     }
-
+    
+    int minBedrooms;
+    if (!readNonnegative("Enter minimum bedrooms (whole number): ", minBedrooms)) {
+        return 0;
+    }
+    conditions.minBedrooms = minBedrooms;
+    
+    if (!readNonnegative("Enter minimum bathrooms (e.g., 1.5): ",
+                         conditions.minBathrooms)) {
+        return 0;
+    }
     vector<Apartment> filtered =
         filteringApartments(apartments, conditions);
 
